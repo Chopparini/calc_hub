@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CalcHub - Profil</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1a2e;font-family:system-ui,sans-serif;color:#e8e6f0;min-height:100vh;padding-bottom:60px}
+.nav{background:#16213e;border-bottom:0.5px solid #2d2d4e;padding:0 24px;height:52px;display:flex;align-items:center}
+.logo{font-size:18px;font-weight:500;color:#a78bfa}
+.content{padding:24px}
+.avatar{width:64px;height:64px;border-radius:50%;background:#2d1b69;border:2px solid #7c3aed;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:500;color:#a78bfa;margin-bottom:12px}
+.user-name{font-size:18px;font-weight:500;margin-bottom:2px}
+.user-email{font-size:13px;color:#9994b8;margin-bottom:24px}
+.section-title{font-size:12px;color:#9994b8;font-weight:500;letter-spacing:0.06em;margin-bottom:10px}
+.card{background:#16213e;border:0.5px solid #2d2d4e;border-radius:12px;padding:16px;margin-bottom:16px}
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.form-group label{font-size:12px;color:#9994b8}
+.form-group select{background:#0f0f23;border:0.5px solid #2d2d4e;color:#e8e6f0;padding:8px 10px;border-radius:8px;font-size:13px}
+.ryczalt-extra{background:#0f0f23;border:0.5px solid #7c3aed;border-radius:8px;padding:12px;margin-top:8px}
+.ryczalt-label{font-size:11px;color:#a78bfa;margin-bottom:6px}
+.save-btn{width:100%;background:#7c3aed;border:none;color:#fff;padding:11px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer}
+.settings-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:0.5px solid #2d2d4e}
+.settings-row:last-child{border-bottom:none;padding-bottom:0}
+.settings-label{font-size:13px;color:#e8e6f0}
+.settings-value{font-size:13px;color:#9994b8}
+.logout-btn{width:100%;background:transparent;border:0.5px solid #7f1d1d;color:#f87171;padding:11px;border-radius:8px;font-size:14px;cursor:pointer}
+.footer-nav{background:#16213e;border-top:0.5px solid #2d2d4e;padding:10px 24px;display:flex;justify-content:space-around;position:fixed;bottom:0;width:100%}
+.fn-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:#9994b8;cursor:pointer}
+.fn-item.active{color:#a78bfa}
+</style>
+</head>
+<body>
+<nav class="nav"><span class="logo">CalcHub</span></nav>
+<div class="content">
+  <div class="avatar">PP</div>
+  <div class="user-name">paula</div>
+  <div class="user-email">piotrowska.paul@gmail.com</div>
+  <div class="section-title">Domyślne ustawienia kalkulatora</div>
+  <div class="card">
+    <div class="form-group"><label>Forma działalności</label><select><option selected>JDG / B2B</option><option>Umowa o pracę</option></select></div>
+    <div class="form-group"><label>Forma opodatkowania (JDG)</label><select><option>Podatek liniowy (19%)</option><option selected>Ryczałt</option><option>Skala podatkowa</option></select></div>
+    <div class="ryczalt-extra">
+      <div class="ryczalt-label">Stawka ryczałtu</div>
+      <select style="width:100%;background:#1a1a2e;border:0.5px solid #2d2d4e;color:#e8e6f0;padding:8px 10px;border-radius:8px;font-size:13px">
+        <option>8,5% — usługi IT, wolne zawody</option>
+        <option>12% — programiści, konsultanci</option>
+        <option>15% — pośrednictwo, reklama</option>
+        <option>17% — wolne zawody (lekarze, prawnicy)</option>
+      </select>
+    </div>
+    <div class="form-group" style="margin-top:12px"><label>Składki ZUS</label><select><option selected>Pełne ZUS</option><option>Mały ZUS Plus</option><option>Preferencyjne</option></select></div>
+    <div style="margin-top:14px"><button class="save-btn">Zapisz ustawienia</button></div>
+  </div>
+  <div class="section-title">Konto</div>
+  <div class="card">
+    <div class="settings-row"><span class="settings-label">Login</span><span class="settings-value">paula</span></div>
+    <div class="settings-row"><span class="settings-label">E-mail</span><span class="settings-value">piotrowska.paul@gmail.com</span></div>
+    <div class="settings-row"><span class="settings-label">Data rejestracji</span><span class="settings-value">21 czerwca 2026</span></div>
+    <div class="settings-row"><span class="settings-label">Zapisanych kalkulacji</span><span class="settings-value">3</span></div>
+  </div>
+  <button class="logout-btn">Wyloguj się</button>
+</div>
+<div class="footer-nav">
+  <div class="fn-item">Kalkulator</div>
+  <div class="fn-item">Zapisane</div>
+  <div class="fn-item active">Profil</div>
+</div>
+</body></html>
