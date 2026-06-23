@@ -8,7 +8,7 @@ from app.core.config import settings
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-# wstępne funkcje bezpieczenstwa
+# hashowanie haseł i obsługa tokenów JWT
 
 
 def hash_password(password: str) -> str:
@@ -21,7 +21,8 @@ def verify_password(plain: str, hashed: str) -> bool:
 
 def create_access_token(data: dict) -> str:
     payload = data.copy()
-    expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
+    expire = datetime.now(timezone.utc) + \
+        timedelta(minutes=settings.access_token_expire_minutes)
     payload["exp"] = expire
     return jwt.encode(payload, settings.secret_key, algorithm=settings.algorithm)
 

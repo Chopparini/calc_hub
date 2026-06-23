@@ -1,14 +1,16 @@
 import enum
 from datetime import datetime, timezone
 
-
-def utcnow():
-    return datetime.now(timezone.utc)
-
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.orm import relationship
 
 from app.database import Base
+
+# definicje tabel do bazy danych
+
+
+def utcnow():
+    return datetime.now(timezone.utc)
 
 
 class TaxForm(str, enum.Enum):
@@ -19,8 +21,7 @@ class TaxForm(str, enum.Enum):
 
 class ContractType(str, enum.Enum):
     b2b = "b2b"                 # JDG / B2B
-    employment = "employment"   # Umowa o pracę
-    mandate = "mandate"         # Umowa zlecenie
+    employment = "employment"   # umowa o pracę
 
 
 class User(Base):
@@ -32,11 +33,12 @@ class User(Base):
     hashed_password = Column(String(255), nullable=False)
     created_at = Column(DateTime, default=utcnow, nullable=False)
 
-    # Profile / default settings
+    # domyślne ustawienia profilu użytkownika
     default_contract_type = Column(Enum(ContractType), nullable=True)
     default_tax_form = Column(Enum(TaxForm), nullable=True)
 
-    calculations = relationship("Calculation", back_populates="owner", cascade="all, delete-orphan")
+    calculations = relationship(
+        "Calculation", back_populates="owner", cascade="all, delete-orphan")
 
 
 class Calculation(Base):
@@ -45,16 +47,17 @@ class Calculation(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
-    # Input
+    # dane wejściowe kalkulacji
     contract_type = Column(Enum(ContractType), nullable=False)
-    tax_form = Column(Enum(TaxForm), nullable=True)  # only for B2B
+    tax_form = Column(Enum(TaxForm), nullable=True)  # tylko dla B2B
     gross_income = Column(Numeric(12, 2), nullable=False)
     monthly_costs = Column(Numeric(12, 2), default=0, nullable=False)
 
-    # Results stored as JSON string for flexibility
+    # wynik zapisany jako JSON
     result_json = Column(Text, nullable=False)
 
-    name = Column(String(100), nullable=True)  # optional user-given label
+    # opcjonalna nazwa nadana przez użytkownika
+    name = Column(String(100), nullable=True)
     created_at = Column(DateTime, default=utcnow, nullable=False)
 
     owner = relationship("User", back_populates="calculations")

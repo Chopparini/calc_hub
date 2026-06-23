@@ -1,13 +1,16 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.database import Base, engine
-
-# uruchomienie instancji FastAPI
+from app.routers import auth
 
 
-app = FastAPI(title="CalcHub API", version="1.0.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    yield
 
+app = FastAPI(title="CalcHub API", version="1.0.0", lifespan=lifespan)
 
 # zezwolenie przeglądarce na komunikację
 app.add_middleware(
@@ -18,16 +21,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-@app.on_event("startup")
-def create_tables():
-    '''
-    Tworzy tabele danych w db wg zadanego modelu
-    '''
-    Base.metadata.create_all(bind=engine)
+app.include_router(auth.router)
 
 
-# sprawdzanie zywotnosci serwera
 @app.get("/health")
 def health():
+    # sprawdzanie zywotnosci serwera
     return {"status": "ok"}
