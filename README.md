@@ -89,7 +89,7 @@ pytest
 ## Funkcjonalności
 
 ### Kalkulator
-- **JDG / B2B** — podatek liniowy, skala podatkowa, ryczałt; pełne ZUS / preferencyjne / ulga na start; dobrowolna chorobowa
+- **JDG / B2B** — podatek liniowy, skala podatkowa, ryczałt; pałny ZUS / mały ZUS / ulga na start; dobrowolna chorobowa
 - **Umowa o pracę** — standardowe KUP lub 50% KUP (prawa autorskie); koszt pracodawcy
 - **Porównanie JDG vs UoP** — różnica netto w jednym widoku
 
