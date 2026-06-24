@@ -24,6 +24,12 @@ class ContractType(str, enum.Enum):
     employment = "employment"   # umowa o pracę
 
 
+class ZUSVariant(str, enum.Enum):
+    full = "full"                    # pełne ZUS
+    preferential = "preferential"    # preferencyjne (pierwsze 24 mies.)
+    ulga_na_start = "ulga_na_start"  # ulga na start (pierwsze 6 mies.)
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -36,6 +42,14 @@ class User(Base):
     # domyślne ustawienia profilu użytkownika
     default_contract_type = Column(Enum(ContractType), nullable=True)
     default_tax_form = Column(Enum(TaxForm), nullable=True)
+    default_zus_variant = Column(Enum(ZUSVariant), nullable=True)
+    default_lump_sum_rate = Column(
+        Numeric(4, 3), nullable=True)  # np. 0.120 dla 12%
+    # 1 = tak, 0 = nie, None = brak domyślnej
+    default_z_chorobowa = Column(Integer, nullable=True)
+    default_uop_gross = Column(Numeric(12, 2), nullable=True)
+    # "23", "8", "5", "0", "zw"
+    default_vat_rate = Column(String(5), nullable=True)
 
     calculations = relationship(
         "Calculation", back_populates="owner", cascade="all, delete-orphan")
@@ -49,7 +63,8 @@ class Calculation(Base):
 
     # dane wejściowe kalkulacji
     contract_type = Column(Enum(ContractType), nullable=False)
-    tax_form = Column(Enum(TaxForm), nullable=True)  # tylko dla B2B
+    tax_form = Column(Enum(TaxForm), nullable=True)        # tylko dla B2B
+    zus_variant = Column(Enum(ZUSVariant), nullable=True)  # tylko dla B2B
     gross_income = Column(Numeric(12, 2), nullable=False)
     monthly_costs = Column(Numeric(12, 2), default=0, nullable=False)
 
