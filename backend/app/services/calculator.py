@@ -162,6 +162,8 @@ def kalkuluj_jdg(
         "zus_social":       _r(zus_total),
         "zus_breakdown":    {k: float(v) for k, v in zus.items()},
         "vat_monthly":      vat,
+        "vat_rate":         vat_rate,
+        "lump_sum_rate":    float(stawka_ryczalt) if tax_form == "lump_sum" else None,
     }
 
 

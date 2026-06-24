@@ -167,11 +167,14 @@ export default function ProfilePage() {
             <label className="flex flex-col gap-1">
               <span className="text-xs text-[#9994b8]">Domyślna stawka brutto (zł)</span>
               <input
-                type="number"
-                min={0}
+                type="text"
+                inputMode="decimal"
                 placeholder="np. 8000"
                 value={profile.default_uop_gross ?? ''}
-                onChange={e => setField('default_uop_gross')(e.target.value ? +e.target.value : null)}
+                onChange={e => {
+                  const v = e.target.value
+                  setField('default_uop_gross')(v ? parseFloat(v.replace(',', '.')) || null : null)
+                }}
                 className="bg-[#0f0f23] border border-[#2d2d4e] text-[#e8e6f0] px-3 py-2 rounded-lg text-sm" />
             </label>
           )}
@@ -194,7 +197,7 @@ export default function ProfilePage() {
                   }`}>
                   <option value="">Wybierz...</option>
                   <option value="linear">Podatek liniowy (19%)</option>
-                  <option value="scale">Skala podatkowa</option>
+                  <option value="scale">Skala podatkowa (12%/32%)</option>
                   <option value="lump_sum">Ryczałt</option>
                 </select>
               </label>
