@@ -25,7 +25,8 @@ def calculate(req: CalculateRequest):
             vat_rate=req.vat_rate,
         )
     else:
-        result = kalkuluj_uop(brutto=req.gross_income, udzial_praw_autorskich=req.udzial_praw_autorskich)
+        result = kalkuluj_uop(brutto=req.gross_income,
+                              udzial_praw_autorskich=req.udzial_praw_autorskich)
     return result
 
 
@@ -40,7 +41,8 @@ def compare(req: CompareRequest):
         z_chorobowa=req.z_chorobowa,
         vat_rate=req.vat_rate,
     )
-    uop = kalkuluj_uop(brutto=req.uop_gross, udzial_praw_autorskich=req.udzial_praw_autorskich)
+    uop = kalkuluj_uop(brutto=req.uop_gross,
+                       udzial_praw_autorskich=req.udzial_praw_autorskich)
     return {
         "b2b": b2b,
         "uop": uop,

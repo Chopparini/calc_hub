@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useCalculator } from '@shared/hooks/useCalculator'
-import type { TaxForm, ZUSVariant } from '@shared/types'
-import { calculationsApi, profileApi } from '@shared/api'
+import type { TaxForm, ZUSVariant, CalculateResult } from '@shared/types'
+import { calculationsApi, profileApi, calculatorApi } from '@shared/api'
 import { useAuth } from '@shared/hooks/useAuth'
 
-type Tab = 'b2b' | 'uop' | 'compare'
+type Tab = 'b2b' | 'uop'
 
 const LUMP_SUM_RATES = [
   { label: '2% (handel)', value: 0.02 },
@@ -25,7 +25,7 @@ function fmt(n: number) {
 
 export default function CalculatorPage() {
   const [tab, setTab] = useState<Tab>('b2b')
-  const { result, compareResult, loading, error, calculate, compare, reset } = useCalculator()
+  const { result, loading, error, calculate, reset } = useCalculator()
   const { isLoggedIn } = useAuth()
   const [saved, setSaved] = useState(false)
 
@@ -36,10 +36,18 @@ export default function CalculatorPage() {
   const [lumpSumRate, setLumpSumRate] = useState(0.12)
   const [vatRate, setVatRate] = useState('23')
   const [zusVariant, setZusVariant] = useState<ZUSVariant>('full')
-  const [zChorobowa, setZChorobowa] = useState(true)
+  const [zChorobowa, setZChorobowa] = useState(false)
 
   // UoP fields
   const [uopIncome, setUopIncome] = useState('')
+
+  // B2B comparison (z kosztu pracodawcy UoP)
+  const [b2bCompare, setB2bCompare] = useState<{
+    linear: CalculateResult
+    scale: CalculateResult
+    lump_sum: CalculateResult
+  } | null>(null)
+  const [b2bCompareLoading, setB2bCompareLoading] = useState(false)
 
   // Prefill z profilu po zalogowaniu
   useEffect(() => {
@@ -55,21 +63,26 @@ export default function CalculatorPage() {
     }).catch(() => {})
   }, [isLoggedIn])
 
-  // Compare
-  const [cmpB2b, setCmpB2b] = useState('')
-  const [cmpUop, setCmpUop] = useState('')
-  const [cmpCosts, setCmpCosts] = useState('')
+  const handleB2BCompare = async (kostPracodawcy: number) => {
+    setB2bCompareLoading(true)
+    const base = { contract_type: 'b2b' as const, gross_income: kostPracodawcy, monthly_costs: 0, zus_variant: 'full' as const, z_chorobowa: false, vat_rate: '23' }
+    const [linear, scale, lump_sum] = await Promise.all([
+      calculatorApi.calculate({ ...base, tax_form: 'linear' }),
+      calculatorApi.calculate({ ...base, tax_form: 'scale' }),
+      calculatorApi.calculate({ ...base, tax_form: 'lump_sum', lump_sum_rate: 0.12 }),
+    ])
+    setB2bCompare({ linear, scale, lump_sum })
+    setB2bCompareLoading(false)
+  }
 
   const handleCalculate = () => {
     setSaved(false)
+    setB2bCompare(null)
     if (tab === 'b2b') {
       calculate({ contract_type: 'b2b', gross_income: +income, monthly_costs: +costs,
         tax_form: taxForm, lump_sum_rate: lumpSumRate, zus_variant: zusVariant, z_chorobowa: zChorobowa, vat_rate: vatRate })
-    } else if (tab === 'uop') {
-      calculate({ contract_type: 'employment', gross_income: +uopIncome })
     } else {
-      compare({ b2b_income: +cmpB2b, monthly_costs: +cmpCosts,
-        tax_form: taxForm, zus_variant: zusVariant, uop_gross: +cmpUop })
+      calculate({ contract_type: 'employment', gross_income: +uopIncome })
     }
   }
 
@@ -85,8 +98,8 @@ export default function CalculatorPage() {
     setSaved(true)
   }
 
-  const currentResult = tab === 'compare' ? null : result
-  const showResult = tab === 'compare' ? !!compareResult : !!currentResult
+  const currentResult = result
+  const showResult = !!currentResult
 
   return (
     <div>
@@ -97,11 +110,11 @@ export default function CalculatorPage() {
 
       {/* Tabs */}
       <div className="flex gap-1 bg-[#16213e] rounded-xl p-1 mx-6 mb-5">
-        {(['b2b', 'uop', 'compare'] as Tab[]).map(t => (
-          <button key={t} onClick={() => { setTab(t); reset(); setSaved(false) }}
+        {(['b2b', 'uop'] as Tab[]).map(t => (
+          <button key={t} onClick={() => { setTab(t); reset(); setSaved(false); setB2bCompare(null) }}
             className={`flex-1 py-2 text-xs rounded-lg font-medium transition-colors cursor-pointer
               ${tab === t ? 'bg-[#7c3aed] text-white' : 'text-[#9994b8]'}`}>
-            {t === 'b2b' ? 'JDG / B2B' : t === 'uop' ? 'Umowa o pracę' : 'Porównaj'}
+            {t === 'b2b' ? 'JDG / B2B' : 'Umowa o pracę'}
           </button>
         ))}
       </div>
@@ -109,7 +122,7 @@ export default function CalculatorPage() {
       {/* Formularz */}
       <div className="bg-[#16213e] border border-[#2d2d4e] rounded-xl p-5 mx-6 mb-4">
         <p className="text-xs text-[#9994b8] font-medium tracking-wide mb-4">
-          {tab === 'b2b' ? 'PARAMETRY JDG' : tab === 'uop' ? 'PARAMETRY UoP' : 'PORÓWNANIE'}
+          {tab === 'b2b' ? 'PARAMETRY JDG' : 'PARAMETRY UoP'}
         </p>
 
         {tab === 'b2b' && (
@@ -191,28 +204,6 @@ export default function CalculatorPage() {
           </>
         )}
 
-        {tab === 'compare' && (
-          <>
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <label className="flex flex-col gap-1">
-                <span className="text-xs text-[#9994b8]">Przychód B2B (zł)</span>
-                <input type="number" value={cmpB2b} onChange={e => setCmpB2b(e.target.value)}
-                  className="bg-[#0f0f23] border border-[#2d2d4e] text-[#e8e6f0] px-3 py-2 rounded-lg text-sm" />
-              </label>
-              <label className="flex flex-col gap-1">
-                <span className="text-xs text-[#9994b8]">Brutto UoP (zł)</span>
-                <input type="number" value={cmpUop} onChange={e => setCmpUop(e.target.value)}
-                  className="bg-[#0f0f23] border border-[#2d2d4e] text-[#e8e6f0] px-3 py-2 rounded-lg text-sm" />
-              </label>
-            </div>
-            <label className="flex flex-col gap-1 mb-3">
-              <span className="text-xs text-[#9994b8]">Koszty B2B (zł)</span>
-              <input type="number" value={cmpCosts} onChange={e => setCmpCosts(e.target.value)}
-                className="bg-[#0f0f23] border border-[#2d2d4e] text-[#e8e6f0] px-3 py-2 rounded-lg text-sm" />
-            </label>
-          </>
-        )}
-
         <button onClick={handleCalculate} disabled={loading}
           className="w-full bg-[#7c3aed] text-white py-3 rounded-lg text-sm font-medium mt-3 disabled:opacity-50 cursor-pointer">
           {loading ? 'Obliczam...' : '⊞ Oblicz'}
@@ -221,7 +212,7 @@ export default function CalculatorPage() {
         {error && <p className="text-red-400 text-xs mt-2">{error}</p>}
 
         {/* Wyniki B2B / UoP */}
-        {showResult && tab !== 'compare' && currentResult && (
+        {showResult && currentResult && (
           <div className="bg-[#0f0f23] border border-[#2d2d4e] rounded-xl p-4 mt-4">
             <p className="text-xs text-[#9994b8] mb-3">WYNIK KALKULACJI</p>
             <div className="bg-[#2d1b69] border border-[#7c3aed] rounded-xl p-4 text-center mb-4">
@@ -266,10 +257,47 @@ export default function CalculatorPage() {
             )}
 
             {tab === 'uop' && currentResult.koszt_pracodawcy && (
-              <div className="bg-[#16213e] rounded-lg p-3 mb-3">
-                <p className="text-xs text-[#9994b8] mb-1">Całkowity koszt pracodawcy</p>
-                <p className="text-base font-medium text-[#e8e6f0]">{fmt(+currentResult.koszt_pracodawcy)} zł</p>
-              </div>
+              <>
+                <div className="bg-[#16213e] rounded-lg p-3 mb-3">
+                  <p className="text-xs text-[#9994b8] mb-1">Całkowity koszt pracodawcy</p>
+                  <p className="text-base font-medium text-[#e8e6f0]">{fmt(+currentResult.koszt_pracodawcy)} zł</p>
+                </div>
+                <button
+                  onClick={() => handleB2BCompare(+currentResult.koszt_pracodawcy!)}
+                  disabled={b2bCompareLoading}
+                  className="w-full border border-[#7c3aed] text-[#c4b5fd] py-2.5 rounded-lg text-sm mb-3 cursor-pointer disabled:opacity-50">
+                  {b2bCompareLoading ? 'Obliczam...' : '⇄ Szukasz pracy w IT? Porównaj z B2B'}
+                </button>
+                {b2bCompare && (
+                  <div className="bg-[#16213e] border border-[#7c3aed] rounded-xl p-4 mb-3">
+                    <p className="text-xs text-[#9994b8] mb-1">GDYBYŚ BYŁ/A NA B2B</p>
+                    <p className="text-xs text-[#9994b8] mb-3">
+                      Pracodawca płaci {fmt(+currentResult.koszt_pracodawcy)} zł = kwota faktury netto. Pełny ZUS, bez chorobowej, VAT 23%.
+                    </p>
+                    <div className="flex flex-col gap-2">
+                      {([
+                        { key: 'linear', label: 'Podatek liniowy 19%' },
+                        { key: 'scale', label: 'Skala podatkowa 12/32%' },
+                        { key: 'lump_sum', label: 'Ryczałt 12% (IT)' },
+                      ] as const).map(({ key, label }) => {
+                        const r = b2bCompare[key]
+                        const diff = +r.net_monthly - +currentResult.net_monthly
+                        return (
+                          <div key={key} className="bg-[#0f0f23] rounded-lg p-3 flex items-center justify-between">
+                            <div>
+                              <p className="text-xs text-[#9994b8]">{label}</p>
+                              <p className="text-base font-medium text-[#a78bfa]">{fmt(+r.net_monthly)} zł</p>
+                            </div>
+                            <span className={`text-sm font-medium ${diff >= 0 ? 'text-[#22c55e]' : 'text-[#f87171]'}`}>
+                              {diff >= 0 ? '+' : ''}{fmt(diff)} zł
+                            </span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
             {isLoggedIn && (
               <button onClick={handleSave} disabled={saved}
@@ -280,28 +308,6 @@ export default function CalculatorPage() {
           </div>
         )}
 
-        {/* Wyniki porównania */}
-        {tab === 'compare' && compareResult && (
-          <div className="bg-[#0f0f23] border border-[#2d2d4e] rounded-xl p-4 mt-4">
-            <p className="text-xs text-[#9994b8] mb-3">PORÓWNANIE</p>
-            <div className={`text-center mb-4 p-3 rounded-xl border ${+compareResult.roznica_netto >= 0 ? 'bg-[#14291b] border-[#22c55e]' : 'bg-[#2d1b1b] border-[#f87171]'}`}>
-              <p className="text-xs text-[#9994b8] mb-1">B2B vs UoP — różnica netto</p>
-              <p className={`text-2xl font-medium ${+compareResult.roznica_netto >= 0 ? 'text-[#22c55e]' : 'text-[#f87171]'}`}>
-                {+compareResult.roznica_netto >= 0 ? '+' : ''}{fmt(+compareResult.roznica_netto)} zł
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {(['b2b', 'uop'] as const).map(side => (
-                <div key={side} className="bg-[#16213e] rounded-xl p-3">
-                  <p className="text-xs text-[#9994b8] mb-2 font-medium">{side === 'b2b' ? 'JDG / B2B' : 'Umowa o pracę'}</p>
-                  <p className="text-xl font-medium text-[#a78bfa] mb-2">{fmt(+compareResult[side].net_monthly)} zł</p>
-                  <p className="text-xs text-[#9994b8]">Podatek: {fmt(+compareResult[side].income_tax)} zł</p>
-                  <p className="text-xs text-[#9994b8]">ZUS: {fmt(+compareResult[side].zus_social)} zł</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   )

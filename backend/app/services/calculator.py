@@ -37,7 +37,8 @@ from app.core.tax_constants import (
 class ZUSVariant(str, Enum):
     full = "full"                    # pełne ZUS
     preferential = "preferential"    # preferencyjne (pierwsze 24 mies.)
-    ulga_na_start = "ulga_na_start"  # ulga na start (pierwsze 6 mies.) — brak składek społecznych
+    # ulga na start (pierwsze 6 mies.) — brak składek społecznych
+    ulga_na_start = "ulga_na_start"
 
 
 def _r(v: Decimal) -> Decimal:
@@ -56,7 +57,8 @@ def _zus_from_base(podstawa: Decimal, with_fp: bool = True, with_chorobowa: bool
 
 def _maly_plus_podstawa(poprzedni_rok: Decimal) -> Decimal:
     """Podstawa MZP = 30% × średni dzienny przychód × 30, wg art. 18c ustawy systemowej."""
-    podstawa = _r(Decimal("0.30") * (poprzedni_rok / Decimal("365")) * Decimal("30"))
+    podstawa = _r(Decimal("0.30") * (poprzedni_rok /
+                  Decimal("365")) * Decimal("30"))
     min_p = _r(MINIMALNE_WYNAGRODZENIE * Decimal("0.30"))
     return max(min_p, min(podstawa, ZUS_PODSTAWA_PELNA))
 
@@ -92,7 +94,8 @@ def _pit_skala_roczny(podstawa: Decimal) -> Decimal:
 
 
 _PLN = Decimal("1")
-_ULGA_MIESIECZNA = Decimal("300")  # kwota wolna miesięcznie = 30 000 × 12% / 12
+# kwota wolna miesięcznie = 30 000 × 12% / 12
+_ULGA_MIESIECZNA = Decimal("300")
 
 
 def _pit_uop_miesieczny(podstawa_pit: Decimal) -> Decimal:
@@ -106,11 +109,13 @@ def _pit_uop_miesieczny(podstawa_pit: Decimal) -> Decimal:
         zaliczka = podstawa_pit * PIT_STAWKA_NISKA - _ULGA_MIESIECZNA
     else:
         prog_m = _r(PIT_PROG_ROCZNY / 12)
-        zaliczka = prog_m * PIT_STAWKA_NISKA - _ULGA_MIESIECZNA + (podstawa_pit - prog_m) * PIT_STAWKA_WYSOKA
+        zaliczka = prog_m * PIT_STAWKA_NISKA - _ULGA_MIESIECZNA + \
+            (podstawa_pit - prog_m) * PIT_STAWKA_WYSOKA
     return max(zaliczka.quantize(_PLN, rounding=ROUND_HALF_UP), Decimal("0"))
 
 
-_VAT_STAWKI = {"23": Decimal("0.23"), "8": Decimal("0.08"), "5": Decimal("0.05"), "0": Decimal("0.00"), "zw": Decimal("0.00")}
+_VAT_STAWKI = {"23": Decimal("0.23"), "8": Decimal("0.08"), "5": Decimal(
+    "0.05"), "0": Decimal("0.00"), "zw": Decimal("0.00")}
 
 
 def kalkuluj_jdg(
@@ -128,19 +133,24 @@ def kalkuluj_jdg(
 
     if tax_form == "linear":
         dochod = max(przychod - koszty - zus_total, Decimal("0"))
-        pit = _r(dochod * PIT_LINIOWY_STAWKA).quantize(_PLN, rounding=ROUND_HALF_UP)
+        pit = _r(dochod * PIT_LINIOWY_STAWKA).quantize(_PLN,
+                                                       rounding=ROUND_HALF_UP)
         zdrowotna = oblicz_zdrowotna_jdg("linear", dochod, przychod_roczny)
 
     elif tax_form == "scale":
         dochod = max(przychod - koszty - zus_total, Decimal("0"))
-        pit = _r(_pit_skala_roczny(dochod * 12) / 12).quantize(_PLN, rounding=ROUND_HALF_UP)
+        pit = _r(_pit_skala_roczny(dochod * 12) /
+                 12).quantize(_PLN, rounding=ROUND_HALF_UP)
         zdrowotna = oblicz_zdrowotna_jdg("scale", dochod, przychod_roczny)
 
     else:  # lump_sum
-        pit = _r(przychod * stawka_ryczalt).quantize(_PLN, rounding=ROUND_HALF_UP)
-        zdrowotna = oblicz_zdrowotna_jdg("lump_sum", Decimal("0"), przychod_roczny)
+        pit = _r(przychod * stawka_ryczalt).quantize(_PLN,
+                                                     rounding=ROUND_HALF_UP)
+        zdrowotna = oblicz_zdrowotna_jdg(
+            "lump_sum", Decimal("0"), przychod_roczny)
 
-    vat = _r(przychod * _VAT_STAWKI.get(vat_rate, Decimal("0.23"))) if vat_rate != "zw" else None
+    vat = _r((przychod - koszty) * _VAT_STAWKI.get(vat_rate,
+             Decimal("0.23"))) if vat_rate != "zw" else None
     netto = _r(przychod - koszty - zus_total - pit - zdrowotna)
 
     return {
@@ -156,7 +166,8 @@ def kalkuluj_jdg(
 
 
 def kalkuluj_uop(brutto: Decimal, udzial_praw_autorskich: Decimal = Decimal("0")) -> dict:
-    zus_prac = _r(brutto * (UOP_ZUS_EMERYTALNA + UOP_ZUS_RENTOWA + UOP_ZUS_CHOROBOWA))
+    zus_prac = _r(brutto * (UOP_ZUS_EMERYTALNA +
+                  UOP_ZUS_RENTOWA + UOP_ZUS_CHOROBOWA))
     zdrowotna = _r((brutto - zus_prac) * UOP_ZDROWOTNA_STAWKA)
 
     if udzial_praw_autorskich > 0:
@@ -169,7 +180,8 @@ def kalkuluj_uop(brutto: Decimal, udzial_praw_autorskich: Decimal = Decimal("0")
     else:
         kup_miesiecznie = UOP_KUP
 
-    podstawa_pit = (brutto - kup_miesiecznie - zus_prac).quantize(_PLN, rounding=ROUND_HALF_UP)
+    podstawa_pit = (brutto - kup_miesiecznie -
+                    zus_prac).quantize(_PLN, rounding=ROUND_HALF_UP)
     pit = _pit_uop_miesieczny(podstawa_pit)
     netto = _r(brutto - zus_prac - zdrowotna - pit)
 
