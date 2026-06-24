@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CalcHub - Strona główna</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1a2e;font-family:system-ui,sans-serif;color:#e8e6f0;min-height:100vh}
+.nav{background:#16213e;border-bottom:0.5px solid #2d2d4e;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:18px;font-weight:500;color:#a78bfa}
+.nav-right{display:flex;gap:8px}
+.btn-ghost{background:transparent;border:0.5px solid #4c4c7a;color:#c4c2d4;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer}
+.btn-primary{background:#7c3aed;border:none;color:#fff;padding:6px 14px;border-radius:8px;font-size:13px;cursor:pointer}
+.hero{padding:32px 24px 24px;text-align:center}
+.hero h1{font-size:26px;font-weight:500;margin-bottom:8px}
+.hero p{font-size:14px;color:#9994b8;margin-bottom:24px}
+.tabs{display:flex;gap:4px;background:#16213e;border-radius:10px;padding:4px;margin:0 24px 20px}
+.tab{flex:1;padding:8px;text-align:center;font-size:13px;color:#9994b8;border-radius:7px;cursor:pointer}
+.tab.active{background:#7c3aed;color:#fff;font-weight:500}
+.card{background:#16213e;border:0.5px solid #2d2d4e;border-radius:12px;padding:20px;margin:0 24px 16px}
+.card-title{font-size:13px;color:#9994b8;margin-bottom:14px;font-weight:500;letter-spacing:0.04em}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.form-group{display:flex;flex-direction:column;gap:5px}
+.form-group label{font-size:12px;color:#9994b8}
+.form-group input,.form-group select{background:#0f0f23;border:0.5px solid #2d2d4e;color:#e8e6f0;padding:8px 10px;border-radius:8px;font-size:13px}
+.calc-btn{width:100%;background:#7c3aed;border:none;color:#fff;padding:11px;border-radius:8px;font-size:14px;font-weight:500;cursor:pointer;margin-top:4px}
+.results{background:#0f0f23;border:0.5px solid #2d2d4e;border-radius:10px;padding:16px;margin-top:14px}
+.results-title{font-size:12px;color:#9994b8;margin-bottom:12px}
+.netto-hero{background:#2d1b69;border:0.5px solid #7c3aed;border-radius:10px;padding:16px;text-align:center;margin-bottom:12px}
+.netto-label{font-size:12px;color:#c4b5fd;margin-bottom:6px}
+.netto-value{font-size:36px;font-weight:500;color:#a78bfa}
+.netto-sub{font-size:12px;color:#9994b8;margin-top:4px}
+.result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.result-card{background:#16213e;border-radius:8px;padding:12px}
+.result-label{font-size:11px;color:#9994b8;margin-bottom:4px}
+.result-value{font-size:16px;font-weight:500;color:#e8e6f0}
+.result-value.amber{color:#fbbf24}
+.result-value.red{color:#f87171}
+.save-btn{width:100%;background:transparent;border:0.5px solid #7c3aed;color:#a78bfa;padding:9px;border-radius:8px;font-size:13px;cursor:pointer;margin-top:12px}
+.footer-nav{background:#16213e;border-top:0.5px solid #2d2d4e;padding:10px 24px;display:flex;justify-content:space-around;position:fixed;bottom:0;width:100%}
+.fn-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:#9994b8;cursor:pointer}
+.fn-item.active{color:#a78bfa}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="logo">⊞ CalcHub</span>
+  <div class="nav-right">
+    <button class="btn-ghost">Zaloguj się</button>
+    <button class="btn-primary">Zarejestruj</button>
+  </div>
+</nav>
+<div class="hero">
+  <h1>Ile zarobisz na rękę?</h1>
+  <p>Oblicz i porównaj JDG i umowę o pracę</p>
+</div>
+<div class="tabs">
+  <div class="tab active">JDG / B2B</div>
+  <div class="tab">Umowa o pracę</div>
+  <div class="tab">Porównaj</div>
+</div>
+<div class="card">
+  <div class="card-title">Parametry JDG</div>
+  <div class="form-row">
+    <div class="form-group"><label>Przychód miesięczny (zł)</label><input type="number" value="15000"/></div>
+    <div class="form-group"><label>Koszty uzyskania (zł)</label><input type="number" value="2000"/></div>
+  </div>
+  <div class="form-row">
+    <div class="form-group"><label>Forma opodatkowania</label><select><option>Podatek liniowy (19%)</option><option>Skala podatkowa</option><option>Ryczałt</option></select></div>
+    <div class="form-group"><label>Składki ZUS</label><select><option>Pełne ZUS</option><option>Mały ZUS Plus</option><option>Preferencyjne</option></select></div>
+  </div>
+  <button class="calc-btn">⊞ Oblicz</button>
+  <div class="results">
+    <div class="results-title">Wynik kalkulacji</div>
+    <div class="netto-hero">
+      <div class="netto-label">Netto miesięcznie</div>
+      <div class="netto-value">8 547 zł</div>
+      <div class="netto-sub">z przychodu 15 000 zł</div>
+    </div>
+    <div class="result-grid">
+      <div class="result-card"><div class="result-label">Podatek dochodowy</div><div class="result-value amber">2 470 zł</div></div>
+      <div class="result-card"><div class="result-label">Składki ZUS</div><div class="result-value amber">1 983 zł</div></div>
+      <div class="result-card"><div class="result-label">VAT do zapłaty</div><div class="result-value red">3 450 zł</div></div>
+    </div>
+    <button class="save-btn">☆ Zapisz kalkulację</button>
+  </div>
+</div>
+<div style="height:60px"></div>
+<div class="footer-nav">
+  <div class="fn-item active">⊞ Kalkulator</div>
+  <div class="fn-item">⌚ Zapisane</div>
+  <div class="fn-item">👤 Profil</div>
+</div>
+</body></html>

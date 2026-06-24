@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>CalcHub - Zapisane kalkulacje</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#1a1a2e;font-family:system-ui,sans-serif;color:#e8e6f0;min-height:100vh;padding-bottom:60px}
+.nav{background:#16213e;border-bottom:0.5px solid #2d2d4e;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between}
+.logo{font-size:18px;font-weight:500;color:#a78bfa}
+.nav-user{font-size:13px;color:#9994b8}
+.content{padding:24px}
+.page-title{font-size:18px;font-weight:500;margin-bottom:4px}
+.page-sub{font-size:13px;color:#9994b8;margin-bottom:20px}
+.filter-row{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.filter-btn{background:transparent;border:0.5px solid #2d2d4e;color:#9994b8;padding:6px 12px;border-radius:8px;font-size:12px;cursor:pointer}
+.filter-btn.active{border-color:#7c3aed;color:#a78bfa;background:#2d1b69}
+.calc-card{background:#16213e;border:0.5px solid #2d2d4e;border-radius:12px;padding:16px;margin-bottom:10px}
+.calc-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+.calc-name{font-size:14px;font-weight:500}
+.calc-date{font-size:11px;color:#9994b8}
+.badge{font-size:11px;padding:3px 8px;border-radius:6px;font-weight:500}
+.badge-b2b{background:#2d1b69;color:#a78bfa}
+.badge-uop{background:#0f3d2e;color:#34d399}
+.badge-por{background:#1e3a5f;color:#60a5fa}
+.calc-row{display:flex;justify-content:space-between;align-items:center}
+.calc-netto{font-size:22px;font-weight:500;color:#a78bfa}
+.calc-details{font-size:12px;color:#9994b8}
+.calc-actions{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:0.5px solid #2d2d4e}
+.action-btn{background:transparent;border:0.5px solid #2d2d4e;color:#9994b8;padding:6px 12px;border-radius:7px;font-size:12px;cursor:pointer}
+.action-btn.danger{border-color:#7f1d1d;color:#f87171}
+.footer-nav{background:#16213e;border-top:0.5px solid #2d2d4e;padding:10px 24px;display:flex;justify-content:space-around;position:fixed;bottom:0;width:100%}
+.fn-item{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:#9994b8;cursor:pointer}
+.fn-item.active{color:#a78bfa}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <span class="logo">CalcHub</span>
+  <span class="nav-user">paula</span>
+</nav>
+<div class="content">
+  <div class="page-title">Moje kalkulacje</div>
+  <div class="page-sub">Zapisane wyniki obliczeń</div>
+  <div class="filter-row">
+    <button class="filter-btn active">Wszystkie</button>
+    <button class="filter-btn">JDG / B2B</button>
+    <button class="filter-btn">UoP</button>
+    <button class="filter-btn">Porównania</button>
+  </div>
+  <div class="calc-card">
+    <div class="calc-header"><div><div class="calc-name">Moja JDG - liniowy</div><div class="calc-date">21 czerwca 2026</div></div><span class="badge badge-b2b">JDG / B2B</span></div>
+    <div class="calc-row"><div><div style="font-size:11px;color:#9994b8;margin-bottom:2px">Netto miesięcznie</div><div class="calc-netto">8 547 zł</div></div><div style="text-align:right"><div class="calc-details">Przychód: 15 000 zł</div><div class="calc-details">Podatek liniowy 19%</div><div class="calc-details">Pełne ZUS</div></div></div>
+    <div class="calc-actions"><button class="action-btn">Wczytaj</button><button class="action-btn">Zmień nazwę</button><button class="action-btn danger">Usuń</button></div>
+  </div>
+  <div class="calc-card">
+    <div class="calc-header"><div><div class="calc-name">Oferta pracy - Jord</div><div class="calc-date">20 czerwca 2026</div></div><span class="badge badge-uop">UoP</span></div>
+    <div class="calc-row"><div><div style="font-size:11px;color:#9994b8;margin-bottom:2px">Netto miesięcznie</div><div class="calc-netto">7 230 zł</div></div><div style="text-align:right"><div class="calc-details">Brutto: 12 000 zł</div><div class="calc-details">Umowa o pracę</div></div></div>
+    <div class="calc-actions"><button class="action-btn">Wczytaj</button><button class="action-btn">Zmień nazwę</button><button class="action-btn danger">Usuń</button></div>
+  </div>
+  <div class="calc-card">
+    <div class="calc-header"><div><div class="calc-name">B2B vs UoP - porównanie</div><div class="calc-date">18 czerwca 2026</div></div><span class="badge badge-por">Porównanie</span></div>
+    <div class="calc-row"><div><div style="font-size:11px;color:#9994b8;margin-bottom:2px">Różnica netto</div><div class="calc-netto" style="color:#34d399">+1 317 zł</div></div><div style="text-align:right"><div class="calc-details">JDG: 8 547 zł</div><div class="calc-details">UoP: 7 230 zł</div></div></div>
+    <div class="calc-actions"><button class="action-btn">Wczytaj</button><button class="action-btn">Zmień nazwę</button><button class="action-btn danger">Usuń</button></div>
+  </div>
+</div>
+<div class="footer-nav">
+  <div class="fn-item">Kalkulator</div>
+  <div class="fn-item active">Zapisane</div>
+  <div class="fn-item">Profil</div>
+</div>
+</body></html>

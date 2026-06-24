@@ -22,6 +22,9 @@ app.add_middleware(
 )
 
 app.include_router(auth.router)
+app.include_router(calculator.router)
+app.include_router(calculations.router)
+app.include_router(profile.router)
 
 
 @app.get("/health")

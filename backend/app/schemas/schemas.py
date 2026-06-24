@@ -3,7 +3,7 @@ from decimal import Decimal
 
 from pydantic import BaseModel, field_validator
 
-from app.models.models import ContractType, TaxForm
+from app.models.models import ContractType, TaxForm, ZUSVariant
 
 # schematy profilu użytkownika i zapisanych kalkulacji
 
@@ -11,11 +11,17 @@ from app.models.models import ContractType, TaxForm
 class ProfileUpdate(BaseModel):
     default_contract_type: ContractType | None = None
     default_tax_form: TaxForm | None = None
+    default_zus_variant: ZUSVariant | None = None
+    default_lump_sum_rate: Decimal | None = None
+    default_z_chorobowa: bool | None = None
+    default_uop_gross: Decimal | None = None
+    default_vat_rate: str | None = None
 
 
 class CalculationCreate(BaseModel):
     contract_type: ContractType
     tax_form: TaxForm | None = None
+    zus_variant: ZUSVariant | None = None
     gross_income: Decimal
     monthly_costs: Decimal = Decimal("0")
     name: str | None = None
@@ -32,6 +38,7 @@ class CalculationOut(BaseModel):
     id: int
     contract_type: ContractType
     tax_form: TaxForm | None
+    zus_variant: ZUSVariant | None
     gross_income: Decimal
     monthly_costs: Decimal
     result_json: str
