@@ -66,11 +66,11 @@ export default function SavedPage() {
                 <div className="grid grid-cols-4 gap-2">
                   <div>
                     <p className="text-xs text-[#9994b8]">{item.contract_type === 'b2b' ? 'Netto na fakturze' : 'Brutto'}</p>
-                    <p className="text-sm font-medium">{fmt(+item.gross_income)} zł</p>
+                    <p className="text-base font-semibold">{fmt(+item.gross_income)} zł</p>
                   </div>
                   <div>
                     <p className="text-xs text-[#9994b8]">{item.contract_type === 'b2b' ? 'Na rękę' : 'Netto'}</p>
-                    <p className="text-sm font-medium text-[#a78bfa]">{fmt(+result.net_monthly)} zł</p>
+                    <p className="text-base font-semibold text-[#a78bfa]">{fmt(+result.net_monthly)} zł</p>
                   </div>
                   <div>
                     <p className="text-xs text-[#9994b8]">Podatek</p>

@@ -256,17 +256,14 @@ export default function ProfilePage() {
                 </select>
               </label>
 
-              {/* 5. Dobrowolna chorobowa — pojawia się po wyborze ZUS */}
-              {profile.default_zus_variant && (
-                <label className="flex items-center gap-3">
-                  <input
-                    type="checkbox"
-                    checked={profile.default_z_chorobowa ?? true}
-                    onChange={e => setField('default_z_chorobowa')(e.target.checked)}
-                    className="accent-[#7c3aed] w-4 h-4" />
-                  <span className="text-sm text-[#e8e6f0]">Dobrowolna składka chorobowa</span>
-                </label>
-              )}
+              <label className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  checked={profile.default_z_chorobowa ?? false}
+                  onChange={e => setField('default_z_chorobowa')(e.target.checked)}
+                  className="accent-[#7c3aed] w-4 h-4" />
+                <span className="text-sm text-[#e8e6f0]">Dobrowolna składka chorobowa</span>
+              </label>
             </>
           )}
         </div>
