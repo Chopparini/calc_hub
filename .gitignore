@@ -1,0 +1,28 @@
+# Środowisko
+.env
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Bazy lokalne
+*.db
+*.sqlite
+
+# Node
+node_modules/
+.expo/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Build
+.next/
+dist/

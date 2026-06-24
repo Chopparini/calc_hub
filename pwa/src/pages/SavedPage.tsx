@@ -43,29 +43,42 @@ export default function SavedPage() {
               <div key={item.id} className="bg-[#16213e] border border-[#2d2d4e] rounded-xl p-4">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <p className="text-sm font-medium">{item.name || 'Kalkulacja'}</p>
-                    <p className="text-xs text-[#9994b8] mt-0.5">
-                      {item.contract_type === 'b2b' ? 'JDG / B2B' : 'Umowa o pracę'} ·{' '}
-                      {new Date(item.created_at).toLocaleDateString('pl-PL')}
+                    <p className="text-sm font-medium">
+                      {item.contract_type === 'b2b' ? 'JDG / B2B' : 'Umowa o pracę'} · {new Date(item.created_at).toLocaleDateString('pl-PL')}
                     </p>
+                    {item.contract_type === 'b2b' && item.tax_form && (
+                      <p className="text-xs text-[#9994b8] mt-0.5">
+                        {item.tax_form === 'linear'
+                          ? 'Podatek liniowy (19%)'
+                          : item.tax_form === 'scale'
+                          ? 'Skala podatkowa (12%/32%)'
+                          : `Ryczałt (${result.lump_sum_rate != null ? Math.round(result.lump_sum_rate * 100) + '%' : ''})`}
+                        {item.zus_variant && ` · ${item.zus_variant === 'full' ? 'Pełny ZUS' : item.zus_variant === 'preferential' ? 'Mały ZUS' : 'Ulga na start'}`}
+                        {result.vat_rate && ` · VAT ${result.vat_rate === 'zw' ? 'zw.' : result.vat_rate + '%'}`}
+                      </p>
+                    )}
                   </div>
                   <button onClick={() => handleDelete(item.id)}
                     className="text-[#9994b8] text-xs hover:text-red-400 cursor-pointer">
                     Usuń
                   </button>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-4 gap-2">
                   <div>
-                    <p className="text-xs text-[#9994b8]">Brutto</p>
+                    <p className="text-xs text-[#9994b8]">{item.contract_type === 'b2b' ? 'Netto na fakturze' : 'Brutto'}</p>
                     <p className="text-sm font-medium">{fmt(+item.gross_income)} zł</p>
                   </div>
                   <div>
-                    <p className="text-xs text-[#9994b8]">Netto</p>
+                    <p className="text-xs text-[#9994b8]">{item.contract_type === 'b2b' ? 'Na rękę' : 'Netto'}</p>
                     <p className="text-sm font-medium text-[#a78bfa]">{fmt(+result.net_monthly)} zł</p>
                   </div>
                   <div>
                     <p className="text-xs text-[#9994b8]">Podatek</p>
                     <p className="text-sm font-medium text-[#fbbf24]">{fmt(+result.income_tax)} zł</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-[#9994b8]">ZUS</p>
+                    <p className="text-sm font-medium text-[#fbbf24]">{fmt(+result.zus_social + +result.health_insurance)} zł</p>
                   </div>
                 </div>
               </div>

@@ -19,17 +19,56 @@ Aplikacja do obliczania i porównywania wynagrodzeń netto dla różnych form ws
 
 ### Backend
 
+1. Utwórz bazę danych w PostgreSQL:
+
+```sql
+CREATE USER calchub WITH PASSWORD 'calchub123';
+CREATE DATABASE calchub OWNER calchub;
+```
+
+2. Skopiuj plik środowiskowy i uzupełnij dane:
+
 ```bash
 cd backend
+cp .env.example .env
+```
+
+W pliku `.env` ustaw `DATABASE_URL` na:
+```
+DATABASE_URL=postgresql://calchub:calchub123@localhost:5432/calchub
+```
+
+3. Uruchom backend:
+
+```bash
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 ```
 
+Tabele w bazie tworzone są automatycznie przy pierwszym uruchomieniu.
+
 Dokumentacja API dostępna pod: `http://localhost:8000/docs`
 
+#### Testowanie API (Postman / Swagger)
+
+Swagger UI dostępny pod `http://localhost:8000/docs` — możesz testować endpointy bezpośrednio w przeglądarce.
+
+**Swagger:**
+1. Wywołaj `POST /auth/register` — kliknij "Try it out" i wpisz dane
+2. Wywołaj `POST /auth/login` — skopiuj `access_token` z odpowiedzi
+3. Kliknij **Authorize** (kłódka w prawym górnym rogu) i wklej token
+4. Od tej pory wszystkie żądania będą wysyłane z tokenem
+
+**Postman:**
+1. `POST /auth/register` — utwórz konto
+2. `POST /auth/login` — skopiuj token z odpowiedzi
+3. W kolejnych żądaniach dodaj nagłówek: `Authorization: Bearer <token>`
+
 ### PWA
+
+Wymaga uruchomionego backendu na porcie 8000.
 
 ```bash
 cd pwa
@@ -39,16 +78,25 @@ npm run dev
 
 Aplikacja dostępna pod: `http://localhost:5173`
 
+### Testy backendu
+
+```bash
+cd backend
+source .venv/bin/activate
+pytest
+```
+
 ## Funkcjonalności
 
 ### Kalkulator
-- **JDG / B2B** — podatek liniowy, skala podatkowa, ryczałt; pełny ZUS / mały ZUS / ulga na start
-- **Umowa o pracę** - kwota netto, koszt pracodawcy
+- **JDG / B2B** — podatek liniowy, skala podatkowa, ryczałt; pałny ZUS / mały ZUS / ulga na start; dobrowolna chorobowa
+- **Umowa o pracę** — standardowe KUP lub 50% KUP (prawa autorskie); koszt pracodawcy
+- **Porównanie JDG vs UoP** — różnica netto w jednym widoku
 
 ### Konto użytkownika
-- Rejestracja i logowanie
+- Rejestracja i logowanie (JWT)
 - Zapis i przeglądanie historii kalkulacji
-- Profil z domyślnymi ustawieniami
+- Profil z domyślnymi ustawieniami (forma działalności, opodatkowanie, ZUS)
 
 ## Struktura projektu
 
@@ -79,16 +127,17 @@ calchub/
 
 ## Stawki podatkowe
 
-Wszystkie stałe do obliczeń na rok 2026 znajdują się w jednym pliku: `backend/app/core/tax_constants.py`
+Wszystkie stawki i kwoty na rok 2026 znajdują się w jednym pliku: `backend/app/core/tax_constants.py`. Aktualizacja na nowy rok = zmiana wartości w tym pliku.
 
 ## API
 
-dokumentacja interaktywna `http://localhost:8000/docs`
+Pełna dokumentacja interaktywna: `http://localhost:8000/docs`
 
 | Endpoint | Opis |
 |---|---|
 | `POST /auth/register` | Rejestracja |
 | `POST /auth/login` | Logowanie, zwraca JWT |
+| `GET /auth/me` | Dane zalogowanego użytkownika |
 | `POST /calculator/calculate` | Obliczenie (B2B lub UoP) |
 | `POST /calculator/compare` | Porównanie B2B vs UoP |
 | `GET /calculations/` | Lista zapisanych kalkulacji |
