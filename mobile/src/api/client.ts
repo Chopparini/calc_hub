@@ -1,10 +1,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Constants from 'expo-constants'
 
-// Automatycznie wykrywa IP hosta dev serwera Expo — działa na fizycznym urządzeniu i emulatorze
 const hostUri = Constants.expoConfig?.hostUri
 const host = hostUri ? hostUri.split(':')[0] : 'localhost'
-export const API_BASE_URL = `http://${host}:8000`
+export const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL ?? `http://${host}:8000`
 
 async function getToken(): Promise<string | null> {
   return AsyncStorage.getItem('token')

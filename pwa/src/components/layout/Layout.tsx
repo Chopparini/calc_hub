@@ -50,7 +50,9 @@ export default function Layout() {
         </NavLink>
         <NavLink to="/profile" className={({ isActive }) =>
           `flex flex-col items-center gap-1 text-xs ${isActive ? 'text-[#a78bfa]' : 'text-[#9994b8]'}`}>
-          <span className="text-lg">👤</span> Profil
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg> Profil
         </NavLink>
       </nav>
     </div>
