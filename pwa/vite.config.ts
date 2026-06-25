@@ -49,9 +49,10 @@ export default defineConfig({
     dedupe: ['react', 'react-dom', 'react-router-dom'],
   },
   server: {
+    host: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:8000',
+        target: process.env.API_TARGET ?? 'http://localhost:8000',
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
