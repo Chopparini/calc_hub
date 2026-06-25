@@ -14,7 +14,7 @@ ZUS_PODSTAWA_PELNA = Decimal("5652.00")
 # Preferencyjne ZUS (pierwsze 24 miesiące): 30% minimalnego wynagrodzenia
 ZUS_PODSTAWA_PREFERENCYJNA = Decimal("1441.80")   # 30% × 4806 PLN min. wynagr.
 
-# Minimalne wynagrodzenie (używane do obliczenia podstawy preferencyjnej)
+# Minimalne wynagrodzenie (dolna granica brutto dla UoP i podstawa ZUS preferencyjnego)
 MINIMALNE_WYNAGRODZENIE = Decimal("4806.00")
 
 # Ulga na start (pierwsze 6 miesięcy): zwolnienie ze składek społecznych
