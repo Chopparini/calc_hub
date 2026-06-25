@@ -1,44 +1,5 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
-
-from app.database import Base, get_db
-from app.main import app
-
-TEST_DATABASE_URL = "sqlite:///:memory:"
-engine = create_engine(
-    TEST_DATABASE_URL,
-    connect_args={"check_same_thread": False},
-    poolclass=StaticPool,
-)
-TestSession = sessionmaker(bind=engine)
-
-
-def override_get_db():
-    db = TestSession()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
-app.dependency_overrides[get_db] = override_get_db
-
-
-@pytest.fixture(autouse=True)
-def setup_db():
-    Base.metadata.create_all(engine)
-    yield
-    Base.metadata.drop_all(engine)
-
-
-@pytest.fixture
-def client():
-    with TestClient(app) as c:
-        yield c
-
 
 VALID_PASSWORD = "SecurePassword123"
 
@@ -59,31 +20,36 @@ def test_register_success(client):
 
 def test_register_duplicate_username(client):
     client.post("/auth/register", json=REGISTER_PAYLOAD)
-    r = client.post("/auth/register", json={**REGISTER_PAYLOAD, "email": "other@example.com"})
+    r = client.post("/auth/register",
+                    json={**REGISTER_PAYLOAD, "email": "other@example.com"})
     assert r.status_code == 400
     assert "Username" in r.json()["detail"]
 
 
 def test_register_duplicate_email(client):
     client.post("/auth/register", json=REGISTER_PAYLOAD)
-    r = client.post("/auth/register", json={**REGISTER_PAYLOAD, "username": "other"})
+    r = client.post("/auth/register",
+                    json={**REGISTER_PAYLOAD, "username": "other"})
     assert r.status_code == 400
     assert "Email" in r.json()["detail"]
 
 
 def test_register_password_too_short(client):
-    r = client.post("/auth/register", json={**REGISTER_PAYLOAD, "password": "short"})
+    r = client.post("/auth/register",
+                    json={**REGISTER_PAYLOAD, "password": "short"})
     assert r.status_code == 422
 
 
 def test_register_invalid_username(client):
-    r = client.post("/auth/register", json={**REGISTER_PAYLOAD, "username": "bad user!"})
+    r = client.post("/auth/register",
+                    json={**REGISTER_PAYLOAD, "username": "bad user!"})
     assert r.status_code == 422
 
 
 def test_login_success(client):
     client.post("/auth/register", json=REGISTER_PAYLOAD)
-    r = client.post("/auth/login", json={"username": "testuser", "password": VALID_PASSWORD})
+    r = client.post(
+        "/auth/login", json={"username": "testuser", "password": VALID_PASSWORD})
     assert r.status_code == 200
     assert "access_token" in r.json()
     assert r.json()["token_type"] == "bearer"
@@ -91,23 +57,27 @@ def test_login_success(client):
 
 def test_login_wrong_password(client):
     client.post("/auth/register", json=REGISTER_PAYLOAD)
-    r = client.post("/auth/login", json={"username": "testuser", "password": "WrongPassword999"})
+    r = client.post(
+        "/auth/login", json={"username": "testuser", "password": "WrongPassword999"})
     assert r.status_code == 401
 
 
 def test_login_unknown_user(client):
-    r = client.post("/auth/login", json={"username": "nobody", "password": VALID_PASSWORD})
+    r = client.post(
+        "/auth/login", json={"username": "nobody", "password": VALID_PASSWORD})
     assert r.status_code == 401
 
 
 def test_get_current_user_valid_token(client):
     client.post("/auth/register", json=REGISTER_PAYLOAD)
-    token = client.post("/auth/login", json={"username": "testuser", "password": VALID_PASSWORD}).json()["access_token"]
+    token = client.post(
+        "/auth/login", json={"username": "testuser", "password": VALID_PASSWORD}).json()["access_token"]
     r = client.get("/auth/me", headers={"Authorization": f"Bearer {token}"})
     assert r.status_code == 200
     assert r.json()["username"] == "testuser"
 
 
 def test_get_current_user_invalid_token(client):
-    r = client.get("/auth/me", headers={"Authorization": "Bearer invalidtoken"})
+    r = client.get(
+        "/auth/me", headers={"Authorization": "Bearer invalidtoken"})
     assert r.status_code == 401
