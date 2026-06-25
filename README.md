@@ -15,7 +15,7 @@ Aplikacja do obliczania i porównywania wynagrodzeń netto dla różnych form ws
 ### Wymagania
 - Python 3.14+
 - Node.js 18+
-- PostgreSQL (baza: `calchub`, user: `calchub`, hasło: `calchub123`)
+- PostgreSQL 
 
 ### Backend
 
@@ -26,28 +26,31 @@ CREATE USER calchub WITH PASSWORD 'calchub123';
 CREATE DATABASE calchub OWNER calchub;
 ```
 
-2. Skopiuj plik środowiskowy i uzupełnij dane:
+2. Skopiuj plik środowiskowy:
 
 ```bash
 cd backend
 cp .env.example .env
 ```
 
-W pliku `.env` ustaw `DATABASE_URL` na:
+W pliku `.env` ustaw `DATABASE_URL`:
 ```
-DATABASE_URL=postgresql://calchub:calchub123@localhost:5432/calchub
+DATABASE_URL=postgresql+psycopg://calchub:calchub123@localhost:5432/calchub
 ```
 
-3. Uruchom backend:
+3. Utwórz środowisko wirtualne i zainstaluj zależności:
 
 ```bash
 python3 -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
 ```
 
-Tabele w bazie tworzone są automatycznie przy pierwszym uruchomieniu.
+4. Uruchom backend:
+
+```bash
+uvicorn app.main:app --reload --port 8000
+```
 
 Dokumentacja API dostępna pod: `http://localhost:8000/docs`
 
@@ -78,18 +81,31 @@ npm run dev
 
 Aplikacja dostępna pod: `http://localhost:5173`
 
+### Cały stack przez Docker
+
+Alternatywa dla ręcznej instalacji — wymaga Docker Desktop.
+
+```bash
+docker compose up --build
+```
+
+- PWA: `http://localhost:5173`
+- Backend / Swagger: `http://localhost:8000/docs`
+
+Tabele tworzone automatycznie przy starcie kontenera.
+
 ### Testy backendu
 
 ```bash
 cd backend
-source .venv/bin/activate
+source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pytest
 ```
 
 ## Funkcjonalności
 
 ### Kalkulator
-- **JDG / B2B** — podatek liniowy, skala podatkowa, ryczałt; pałny ZUS / mały ZUS / ulga na start; dobrowolna chorobowa
+- **JDG / B2B** — podatek liniowy, skala podatkowa, ryczałt; pełne ZUS / preferencyjne / ulga na start; dobrowolna chorobowa
 - **Umowa o pracę** — standardowe KUP lub 50% KUP (prawa autorskie); koszt pracodawcy
 - **Porównanie JDG vs UoP** — różnica netto w jednym widoku
 
@@ -122,7 +138,7 @@ calchub/
 │   ├── api/                       # klient HTTP (używany przez PWA i mobile)
 │   ├── hooks/                     # React hooks (useAuth, useCalculator)
 │   └── types/                     # typy TypeScript
-└── mobile/                        # React Native + Expo (w trakcie)
+└── mobile/                        # React Native + Expo
 ```
 
 ## Stawki podatkowe
