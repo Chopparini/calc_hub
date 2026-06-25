@@ -1,4 +1,4 @@
-# CalcHub — Kalkulator podatkowy
+# CalcHub - Kalkulator podatkowy
 
 Aplikacja do obliczania i porównywania wynagrodzeń netto dla różnych form współpracy: JDG/B2B, Umowa o pracę. Projekt semestralny.
 
@@ -8,14 +8,19 @@ Aplikacja do obliczania i porównywania wynagrodzeń netto dla różnych form ws
 |---|---|
 | Backend | Python, FastAPI, SQLAlchemy, PostgreSQL, JWT |
 | PWA | React, Vite, TypeScript, Tailwind CSS, React Router |
-| Mobile | React Native, Expo *(w trakcie)* |
+| Mobile | React Native, Expo |
 
 ## Uruchomienie lokalne
 
+```bash
+git clone https://github.com/Chopparini/calcproto.git
+cd calcproto
+```
+
 ### Wymagania
-- Python 3.14+
+- Python 3.10+
 - Node.js 18+
-- PostgreSQL 
+- PostgreSQL
 
 ### Backend
 
@@ -56,20 +61,35 @@ Dokumentacja API dostępna pod: `http://localhost:8000/docs`
 
 #### Testowanie API (Postman / Swagger)
 
-Swagger UI dostępny pod `http://localhost:8000/docs` — możesz testować endpointy bezpośrednio w przeglądarce.
+Swagger UI dostępny pod `http://localhost:8000/docs` - możesz testować endpointy bezpośrednio w przeglądarce.
 
 **Swagger:**
-1. Wywołaj `POST /auth/register` — kliknij "Try it out" i wpisz dane
-2. Wywołaj `POST /auth/login` — skopiuj `access_token` z odpowiedzi
+1. Wywołaj `POST /auth/register` - kliknij "Try it out" i wpisz dane
+2. Wywołaj `POST /auth/login` - skopiuj `access_token` z odpowiedzi
 3. Kliknij **Authorize** (kłódka w prawym górnym rogu) i wklej token
 4. Od tej pory wszystkie żądania będą wysyłane z tokenem
 
 **Postman:**
-1. `POST /auth/register` — utwórz konto
-2. `POST /auth/login` — skopiuj token z odpowiedzi
+1. `POST /auth/register` - utwórz konto
+2. `POST /auth/login` - skopiuj token z odpowiedzi
 3. W kolejnych żądaniach dodaj nagłówek: `Authorization: Bearer <token>`
 
-### PWA
+### Cały stack przez Docker
+
+Zainstaluj [Docker Desktop](https://www.docker.com/products/docker-desktop/).
+
+```bash
+docker compose up --build
+```
+
+- PWA: `http://localhost:5173`
+- Backend / Swagger: `http://localhost:8000/docs`
+
+Baza i tabele tworzone automatycznie przy pierwszym uruchomieniu.
+
+---
+
+### PWA (bez Dockera)
 
 Wymaga uruchomionego backendu na porcie 8000.
 
@@ -80,19 +100,6 @@ npm run dev
 ```
 
 Aplikacja dostępna pod: `http://localhost:5173`
-
-### Cały stack przez Docker
-
-Alternatywa dla ręcznej instalacji — wymaga Docker Desktop.
-
-```bash
-docker compose up --build
-```
-
-- PWA: `http://localhost:5173`
-- Backend / Swagger: `http://localhost:8000/docs`
-
-Tabele tworzone automatycznie przy starcie kontenera.
 
 ### Testy backendu
 
@@ -105,9 +112,9 @@ pytest
 ## Funkcjonalności
 
 ### Kalkulator
-- **JDG / B2B** — podatek liniowy, skala podatkowa, ryczałt; pełne ZUS / preferencyjne / ulga na start; dobrowolna chorobowa
-- **Umowa o pracę** — standardowe KUP lub 50% KUP (prawa autorskie); koszt pracodawcy
-- **Porównanie JDG vs UoP** — różnica netto w jednym widoku
+- **JDG / B2B** - podatek liniowy, skala podatkowa, ryczałt; pełne ZUS / preferencyjne / ulga na start; dobrowolna chorobowa
+- **Umowa o pracę** - standardowe KUP lub 50% KUP (prawa autorskie); koszt pracodawcy
+- **Porównanie JDG vs UoP** - różnica netto w jednym widoku
 
 ### Konto użytkownika
 - Rejestracja i logowanie (JWT)
@@ -121,7 +128,7 @@ calchub/
 ├── backend/
 │   ├── app/
 │   │   ├── core/
-│   │   │   ├── tax_constants.py   # stawki podatkowe 2026 — tu aktualizuj co rok
+│   │   │   ├── tax_constants.py   # stawki podatkowe 2026 - tu aktualizuj co rok
 │   │   │   ├── config.py
 │   │   │   ├── dependencies.py
 │   │   │   └── security.py
