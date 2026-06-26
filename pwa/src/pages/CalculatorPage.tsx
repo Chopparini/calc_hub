@@ -132,7 +132,7 @@ export default function CalculatorPage() {
 
         {tab === 'b2b' && (
           <>
-            <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <label className="flex flex-col gap-1">
                 <span className="text-xs text-[#9994b8]">Miesięczna suma netto z faktur (zł)</span>
                 <input type="text" inputMode="decimal" value={income} onChange={e => setIncome(e.target.value)}
@@ -146,7 +146,7 @@ export default function CalculatorPage() {
                   className="bg-[#0f0f23] border border-[#2d2d4e] text-[#e8e6f0] px-3 py-2 rounded-lg text-sm" />
               </label>
             </div>
-            <div className="grid grid-cols-2 gap-3 mb-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <label className="flex flex-col gap-1">
                 <span className="text-xs text-[#9994b8]">Forma opodatkowania</span>
                 <select value={taxForm} onChange={e => setTaxForm(e.target.value as TaxForm)}
@@ -238,34 +238,34 @@ export default function CalculatorPage() {
               <div className="grid grid-cols-2 gap-2 mb-3">
                 <div className="bg-[#16213e] rounded-lg p-3">
                   <p className="text-xs text-[#9994b8] mb-1">Podatek</p>
-                  <p className="text-base font-medium text-[#fbbf24]">{fmt(+currentResult.income_tax)} zł</p>
+                  <p className="text-base font-medium text-[#fbbf24] whitespace-nowrap">{fmt(+currentResult.income_tax)} zł</p>
                 </div>
                 <div className="bg-[#16213e] rounded-lg p-3">
                   <p className="text-xs text-[#9994b8] mb-1">ZUS społeczny</p>
-                  <p className="text-base font-medium text-[#fbbf24]">{fmt(+currentResult.zus_social)} zł</p>
+                  <p className="text-base font-medium text-[#fbbf24] whitespace-nowrap">{fmt(+currentResult.zus_social)} zł</p>
                 </div>
                 <div className="bg-[#16213e] rounded-lg p-3">
                   <p className="text-xs text-[#9994b8] mb-1">Zdrowotna</p>
-                  <p className="text-base font-medium text-[#fbbf24]">{fmt(+currentResult.health_insurance)} zł</p>
+                  <p className="text-base font-medium text-[#fbbf24] whitespace-nowrap">{fmt(+currentResult.health_insurance)} zł</p>
                 </div>
                 <div className="bg-[#16213e] rounded-lg p-3">
                   <p className="text-xs text-[#9994b8] mb-1">VAT należny</p>
-                  <p className="text-base font-medium text-[#f87171]">{fmt(+(currentResult.vat_monthly ?? 0))} zł</p>
+                  <p className="text-base font-medium text-[#f87171] whitespace-nowrap">{fmt(+(currentResult.vat_monthly ?? 0))} zł</p>
                 </div>
               </div>
             ) : (
-              <div className="grid grid-cols-3 gap-2 mb-3">
-                <div className="bg-[#16213e] rounded-lg p-3">
-                  <p className="text-xs text-[#9994b8] mb-1">Podatek</p>
-                  <p className="text-base font-medium text-[#fbbf24]">{fmt(+currentResult.income_tax)} zł</p>
+              <div className="flex flex-col md:grid md:grid-cols-3 gap-2 mb-3">
+                <div className="bg-[#16213e] rounded-lg p-3 flex justify-between items-center md:flex-col md:items-start md:justify-between md:h-full">
+                  <p className="text-xs text-[#9994b8] md:mb-1">Podatek</p>
+                  <p className="text-sm sm:text-base font-medium text-[#fbbf24] whitespace-nowrap">{fmt(+currentResult.income_tax)} zł</p>
                 </div>
-                <div className="bg-[#16213e] rounded-lg p-3">
-                  <p className="text-xs text-[#9994b8] mb-1">ZUS</p>
-                  <p className="text-base font-medium text-[#fbbf24]">{fmt(+currentResult.zus_social)} zł</p>
+                <div className="bg-[#16213e] rounded-lg p-3 flex justify-between items-center md:flex-col md:items-start md:justify-between md:h-full">
+                  <p className="text-xs text-[#9994b8] md:mb-1">ZUS</p>
+                  <p className="text-sm sm:text-base font-medium text-[#fbbf24] whitespace-nowrap">{fmt(+currentResult.zus_social)} zł</p>
                 </div>
-                <div className="bg-[#16213e] rounded-lg p-3">
-                  <p className="text-xs text-[#9994b8] mb-1">Zdrowotna</p>
-                  <p className="text-base font-medium text-[#fbbf24]">{fmt(+currentResult.health_insurance)} zł</p>
+                <div className="bg-[#16213e] rounded-lg p-3 flex justify-between items-center md:flex-col md:items-start md:justify-between md:h-full">
+                  <p className="text-xs text-[#9994b8] md:mb-1">Zdrowotna</p>
+                  <p className="text-sm sm:text-base font-medium text-[#fbbf24] whitespace-nowrap">{fmt(+currentResult.health_insurance)} zł</p>
                 </div>
               </div>
             )}
@@ -298,19 +298,19 @@ export default function CalculatorPage() {
                     </p>
                     <div className="flex flex-col gap-2">
                       {([
-                        { key: 'linear', label: 'Podatek liniowy 19%' },
-                        { key: 'scale', label: 'Skala podatkowa 12/32%' },
+                        { key: 'linear', label: 'Liniowy 19%' },
+                        { key: 'scale', label: 'Skala 12/32%' },
                         { key: 'lump_sum', label: 'Ryczałt 12% (IT)' },
                       ] as const).map(({ key, label }) => {
                         const r = b2bCompare[key]
                         const diff = +r.net_monthly - +currentResult.net_monthly
                         return (
-                          <div key={key} className="bg-[#0f0f23] rounded-lg p-3 flex items-center justify-between">
-                            <div>
-                              <p className="text-xs text-[#9994b8]">{label}</p>
-                              <p className="text-base font-medium text-[#a78bfa]">{fmt(+r.net_monthly)} zł</p>
+                          <div key={key} className="w-full bg-[#0f0f23] rounded-lg p-3 grid grid-cols-[1fr_auto] items-center gap-2">
+                            <div className="min-w-0">
+                              <p className="text-xs text-[#9994b8] truncate">{label}</p>
+                              <p className="text-sm font-medium text-[#a78bfa] whitespace-nowrap">{fmt(+r.net_monthly)} zł</p>
                             </div>
-                            <span className={`text-sm font-medium ${diff >= 0 ? 'text-[#22c55e]' : 'text-[#f87171]'}`}>
+                            <span className={`text-xs font-medium whitespace-nowrap ${diff >= 0 ? 'text-[#22c55e]' : 'text-[#f87171]'}`}>
                               {diff >= 0 ? '+' : ''}{fmt(diff)} zł
                             </span>
                           </div>
