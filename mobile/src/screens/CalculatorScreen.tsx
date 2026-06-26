@@ -1,13 +1,31 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   ActivityIndicator, Alert, ScrollView, StyleSheet,
-  Text, TextInput, TouchableOpacity, View,
+  Switch, Text, TextInput, TouchableOpacity, View,
 } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { calculationsApi, calculatorApi } from '../api'
+import { calculationsApi, calculatorApi, profileApi } from '../api'
 import { useAuth } from '../context/AuthContext'
 import { colors } from '../theme'
 import type { CalculateResult, TaxForm, ZUSVariant } from '../types'
+
+const LUMP_SUM_RATES = [
+  { label: '2% (handel)', value: 0.02 },
+  { label: '3% (działalność handlowa)', value: 0.03 },
+  { label: '5,5% (produkcja)', value: 0.055 },
+  { label: '8,5% (usługi)', value: 0.085 },
+  { label: '10% (świadczenie usług)', value: 0.10 },
+  { label: '12% (IT / programowanie)', value: 0.12 },
+  { label: '12,5% (najem powyżej 100 tys.)', value: 0.125 },
+  { label: '14% (usługi medyczne)', value: 0.14 },
+  { label: '15% (usługi finansowe)', value: 0.15 },
+  { label: '17% (wolne zawody)', value: 0.17 },
+]
+
+const VAT_RATES = ['23', '8', '5', '0', 'zw'] as const
+const VAT_LABELS: Record<string, string> = {
+  '23': '23%', '8': '8%', '5': '5%', '0': '0%', 'zw': 'ZW',
+}
 
 const fmt = (n: number) =>
   n.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -22,7 +40,10 @@ export default function CalculatorScreen() {
   const [b2bIncome, setB2bIncome]       = useState('')
   const [b2bCosts, setB2bCosts]         = useState('')
   const [taxForm, setTaxForm]           = useState<TaxForm>('linear')
+  const [lumpSumRate, setLumpSumRate]   = useState(0.12)
   const [zusVariant, setZusVariant]     = useState<ZUSVariant>('full')
+  const [vatRate, setVatRate]           = useState('23')
+  const [zChorobowa, setZChorobowa]     = useState(false)
 
   // UoP fields
   const [uopGross, setUopGross] = useState('')
@@ -30,6 +51,19 @@ export default function CalculatorScreen() {
   const [result, setResult]   = useState<CalculateResult | null>(null)
   const [loading, setLoading] = useState(false)
   const [saving, setSaving]   = useState(false)
+
+  useEffect(() => {
+    if (!token) return
+    profileApi.get().then(p => {
+      if (p.default_contract_type) setTab(p.default_contract_type === 'employment' ? 'uop' : 'b2b')
+      if (p.default_tax_form) setTaxForm(p.default_tax_form)
+      if (p.default_lump_sum_rate) setLumpSumRate(p.default_lump_sum_rate)
+      if (p.default_zus_variant) setZusVariant(p.default_zus_variant)
+      if (p.default_z_chorobowa !== null) setZChorobowa(p.default_z_chorobowa ?? false)
+      if (p.default_vat_rate) setVatRate(p.default_vat_rate)
+      if (p.default_uop_gross) setUopGross(String(p.default_uop_gross))
+    }).catch(() => {})
+  }, [token])
 
   async function calculate() {
     setLoading(true)
@@ -42,6 +76,9 @@ export default function CalculatorScreen() {
             gross_income: parseFloat(b2bIncome) || 0,
             monthly_costs: parseFloat(b2bCosts) || 0,
             zus_variant: zusVariant,
+            lump_sum_rate: taxForm === 'lump_sum' ? lumpSumRate : undefined,
+            z_chorobowa: zChorobowa,
+            vat_rate: vatRate,
           }
         : {
             contract_type: 'employment' as const,
@@ -126,6 +163,38 @@ export default function CalculatorScreen() {
                   <Text style={[s.pillText, zusVariant === v && s.pillTextActive]}>{l}</Text>
                 </TouchableOpacity>
               ))}
+            </View>
+
+            {taxForm === 'lump_sum' && (
+              <>
+                <Text style={s.label}>Stawka ryczałtu</Text>
+                <View style={s.pills}>
+                  {LUMP_SUM_RATES.map(r => (
+                    <TouchableOpacity key={r.value} style={[s.pill, lumpSumRate === r.value && s.pillActive]} onPress={() => setLumpSumRate(r.value)}>
+                      <Text style={[s.pillText, lumpSumRate === r.value && s.pillTextActive]}>{r.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </>
+            )}
+
+            <Text style={s.label}>Stawka VAT</Text>
+            <View style={s.pills}>
+              {VAT_RATES.map(v => (
+                <TouchableOpacity key={v} style={[s.pill, vatRate === v && s.pillActive]} onPress={() => setVatRate(v)}>
+                  <Text style={[s.pillText, vatRate === v && s.pillTextActive]}>{VAT_LABELS[v]}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <View style={s.switchRow}>
+              <Text style={s.switchLabel}>Dobrowolna składka chorobowa</Text>
+              <Switch
+                value={zChorobowa}
+                onValueChange={setZChorobowa}
+                trackColor={{ true: colors.accentPrimary, false: colors.borderDefault }}
+                thumbColor={colors.textPrimary}
+              />
             </View>
           </View>
         )}
@@ -226,4 +295,6 @@ const s = StyleSheet.create({
   tileValue:     { color: colors.textPrimary, fontSize: 15, fontWeight: '500' },
   btnOutline:    { borderWidth: 1, borderColor: colors.borderAccent, borderRadius: 10, paddingVertical: 12, alignItems: 'center' },
   btnOutlineText:{ color: colors.accentLight, fontSize: 14 },
+  switchRow:     { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10, marginBottom: 4 },
+  switchLabel:   { color: colors.textSecondary, fontSize: 13, flex: 1, marginRight: 8 },
 })
