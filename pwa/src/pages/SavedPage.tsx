@@ -63,22 +63,22 @@ export default function SavedPage() {
                     Usuń
                   </button>
                 </div>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                   <div>
-                    <p className="text-xs text-[#9994b8]">{item.contract_type === 'b2b' ? 'Netto na fakturze' : 'Brutto'}</p>
-                    <p className="text-base font-semibold">{fmt(+item.gross_income)} zł</p>
+                    <p className="text-xs text-[#9994b8]">{item.contract_type === 'b2b' ? 'Netto (faktura)' : 'Brutto'}</p>
+                    <p className="text-xs font-medium whitespace-nowrap">{fmt(+item.gross_income)} zł</p>
                   </div>
                   <div>
                     <p className="text-xs text-[#9994b8]">{item.contract_type === 'b2b' ? 'Na rękę' : 'Netto'}</p>
-                    <p className="text-base font-semibold text-[#a78bfa]">{fmt(+result.net_monthly)} zł</p>
+                    <p className="text-xs font-medium text-[#a78bfa] whitespace-nowrap">{fmt(+result.net_monthly)} zł</p>
                   </div>
                   <div>
                     <p className="text-xs text-[#9994b8]">Podatek</p>
-                    <p className="text-sm font-medium text-[#fbbf24]">{fmt(+result.income_tax)} zł</p>
+                    <p className="text-xs font-medium text-[#fbbf24] whitespace-nowrap">{fmt(+result.income_tax)} zł</p>
                   </div>
                   <div>
                     <p className="text-xs text-[#9994b8]">ZUS</p>
-                    <p className="text-sm font-medium text-[#fbbf24]">{fmt(+result.zus_social + +result.health_insurance)} zł</p>
+                    <p className="text-xs font-medium text-[#fbbf24] whitespace-nowrap">{fmt(+result.zus_social + +result.health_insurance)} zł</p>
                   </div>
                 </div>
               </div>

@@ -1,8 +1,9 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
 import { NavigationContainer } from '@react-navigation/native'
+import { Ionicons } from '@expo/vector-icons'
 import { StatusBar } from 'expo-status-bar'
 import React, { useState } from 'react'
-import { ActivityIndicator, Text, View } from 'react-native'
+import { ActivityIndicator, View } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { AuthProvider, useAuth } from './src/context/AuthContext'
 import CalculatorScreen from './src/screens/CalculatorScreen'
@@ -13,10 +14,6 @@ import SavedScreen from './src/screens/SavedScreen'
 import { colors } from './src/theme'
 
 const Tab = createBottomTabNavigator()
-
-function TabIcon({ icon, color }: { icon: string; color: string }) {
-  return <Text style={{ fontSize: 20, color }}>{icon}</Text>
-}
 
 function AppNavigator() {
   const { token, loading } = useAuth()
@@ -53,17 +50,17 @@ function AppNavigator() {
       <Tab.Screen
         name="Kalkulator"
         component={CalculatorScreen}
-        options={{ tabBarIcon: ({ color }) => <TabIcon icon="⊞" color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="calculator-outline" size={size} color={color} /> }}
       />
       <Tab.Screen
         name="Zapisane"
         component={SavedScreen}
-        options={{ tabBarIcon: ({ color }) => <TabIcon icon="☰" color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="star-outline" size={size} color={color} /> }}
       />
       <Tab.Screen
         name="Profil"
         component={ProfileScreen}
-        options={{ tabBarIcon: ({ color }) => <TabIcon icon="◉" color={color} /> }}
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="person-outline" size={size} color={color} /> }}
       />
     </Tab.Navigator>
   )
