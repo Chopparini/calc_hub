@@ -16,12 +16,25 @@ const LUMP_SUM_RATES = [
   { label: '17% (wolne zawody)', value: 0.17 },
 ]
 
+function sanitizeDecimalInput(v: string): string {
+  let s = v.replace(/\./g, ',').replace(/[^0-9,]/g, '')
+  const i = s.indexOf(',')
+  if (i !== -1) s = s.slice(0, i + 1) + s.slice(i + 1).replace(/,/g, '')
+  return s
+}
+
+function grossToRaw(n: number | null | undefined): string {
+  if (n == null) return ''
+  return String(n).replace('.', ',')
+}
+
 export default function ProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [saved, setSaved] = useState(false)
   const [validationError, setValidationError] = useState('')
   const [loading, setLoading] = useState(true)
   const [isDirty, setIsDirty] = useState(false)
+  const [uopGrossRaw, setUopGrossRaw] = useState('')
   const original = useRef<UserProfile | null>(null)
 
   const blocker = useBlocker(isDirty)
@@ -30,6 +43,7 @@ export default function ProfilePage() {
     profileApi.get().then(p => {
       setProfile(p)
       original.current = p
+      setUopGrossRaw(grossToRaw(p.default_uop_gross))
     }).finally(() => setLoading(false))
   }, [])
 
@@ -96,6 +110,7 @@ export default function ProfilePage() {
     const fresh = await profileApi.get()
     setProfile(fresh)
     original.current = fresh
+    setUopGrossRaw(grossToRaw(fresh.default_uop_gross))
     setIsDirty(false)
     setValidationError('')
     setLoading(false)
@@ -114,6 +129,7 @@ export default function ProfilePage() {
     })
     setProfile(cleared)
     original.current = cleared
+    setUopGrossRaw('')
     setIsDirty(false)
     setValidationError('')
   }
@@ -170,10 +186,11 @@ export default function ProfilePage() {
                 type="text"
                 inputMode="decimal"
                 placeholder="np. 8000"
-                value={profile.default_uop_gross ?? ''}
+                value={uopGrossRaw}
                 onChange={e => {
-                  const v = e.target.value
-                  setField('default_uop_gross')(v ? parseFloat(v.replace(',', '.')) || null : null)
+                  const s = sanitizeDecimalInput(e.target.value)
+                  setUopGrossRaw(s)
+                  setField('default_uop_gross')(s ? parseFloat(s.replace(',', '.')) || null : null)
                 }}
                 className="bg-[#0f0f23] border border-[#2d2d4e] text-[#e8e6f0] px-3 py-2 rounded-lg text-sm" />
             </label>
