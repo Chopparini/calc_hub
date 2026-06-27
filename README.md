@@ -199,7 +199,7 @@ Wszystkie stawki i kwoty na rok 2026 znajdują się w jednym pliku: `backend/app
 
 ## API
 
-Pełna dokumentacja interaktywna: `http://localhost:8000/docs`
+Pełna dokumentacja interaktywna: `https://calchub-production-ad54.up.railway.app/docs`
 
 | Endpoint | Opis |
 |---|---|
