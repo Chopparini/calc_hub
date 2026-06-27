@@ -88,6 +88,12 @@ export default function SavedScreen() {
                   </View>
                   <View style={s.row}>
                     <View style={s.stat}>
+                      <Text style={s.statLabel}>Brutto</Text>
+                      <Text style={s.statValue}>
+                        {fmt(+item.gross_income)} zł
+                      </Text>
+                    </View>
+                    <View style={s.stat}>
                       <Text style={s.statLabel}>Netto</Text>
                       <Text style={[s.statValue, { color: colors.accentLight }]}>
                         {fmt(+result.net_monthly)} zł
@@ -100,9 +106,9 @@ export default function SavedScreen() {
                       </Text>
                     </View>
                     <View style={s.stat}>
-                      <Text style={s.statLabel}>ZUS</Text>
+                      <Text style={s.statLabel}>ZUS+Zdrowotna</Text>
                       <Text style={[s.statValue, { color: colors.warning }]}>
-                        {fmt(+result.zus_social)} zł
+                        {fmt(+result.zus_social + +result.health_insurance)} zł
                       </Text>
                     </View>
                   </View>
@@ -126,8 +132,8 @@ const s = StyleSheet.create({
   cardTitle:  { color: colors.textPrimary, fontSize: 15, fontWeight: '500' },
   cardSub:    { color: colors.textSecondary, fontSize: 12, marginTop: 2 },
   deleteBtn:  { color: colors.error, fontSize: 13 },
-  row:        { flexDirection: 'row', gap: 8 },
-  stat:       { flex: 1, backgroundColor: colors.bgInput, borderRadius: 8, padding: 10 },
+  row:        { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  stat:       { flexBasis: '47%', flexGrow: 1, backgroundColor: colors.bgInput, borderRadius: 8, padding: 10 },
   statLabel:  { color: colors.textSecondary, fontSize: 11, marginBottom: 2 },
   statValue:  { color: colors.textPrimary, fontSize: 14, fontWeight: '500' },
 })
