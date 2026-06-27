@@ -28,6 +28,13 @@ function parse(v: string): number {
   return parseFloat(v.replace(',', '.')) || 0
 }
 
+function sanitizeDecimalInput(v: string): string {
+  let s = v.replace(/\./g, ',').replace(/[^0-9,]/g, '')
+  const i = s.indexOf(',')
+  if (i !== -1) s = s.slice(0, i + 1) + s.slice(i + 1).replace(/,/g, '')
+  return s
+}
+
 export default function CalculatorPage() {
   const [tab, setTab] = useState<Tab>('b2b')
   const { result, loading, error, calculate, reset } = useCalculator()
@@ -64,7 +71,7 @@ export default function CalculatorPage() {
       if (p.default_zus_variant) setZusVariant(p.default_zus_variant)
       if (p.default_z_chorobowa !== null) setZChorobowa(p.default_z_chorobowa ?? true)
       if (p.default_vat_rate) setVatRate(p.default_vat_rate)
-      if (p.default_uop_gross) setUopIncome(String(p.default_uop_gross))
+      if (p.default_uop_gross) setUopIncome(String(p.default_uop_gross).replace('.', ','))
     }).catch(() => {})
   }, [isLoggedIn])
 
@@ -135,13 +142,13 @@ export default function CalculatorPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
               <label className="flex flex-col gap-1">
                 <span className="text-xs text-[#9994b8]">Miesięczna suma netto z faktur (zł)</span>
-                <input type="text" inputMode="decimal" value={income} onChange={e => setIncome(e.target.value)}
+                <input type="text" inputMode="decimal" value={income} onChange={e => setIncome(sanitizeDecimalInput(e.target.value))}
                   placeholder="np. 15000"
                   className="bg-[#0f0f23] border border-[#2d2d4e] text-[#e8e6f0] px-3 py-2 rounded-lg text-sm" />
               </label>
               <label className="flex flex-col gap-1">
                 <span className="text-xs text-[#9994b8]">Koszty uzyskania netto (zł)</span>
-                <input type="text" inputMode="decimal" value={costs} onChange={e => setCosts(e.target.value)}
+                <input type="text" inputMode="decimal" value={costs} onChange={e => setCosts(sanitizeDecimalInput(e.target.value))}
                   placeholder="np. 2000"
                   className="bg-[#0f0f23] border border-[#2d2d4e] text-[#e8e6f0] px-3 py-2 rounded-lg text-sm" />
               </label>
@@ -204,7 +211,7 @@ export default function CalculatorPage() {
                 <>
                   <label className="flex flex-col gap-1 mb-1">
                     <span className="text-xs text-[#9994b8]">Wynagrodzenie brutto (zł)</span>
-                    <input type="text" inputMode="decimal" value={uopIncome} onChange={e => setUopIncome(e.target.value)}
+                    <input type="text" inputMode="decimal" value={uopIncome} onChange={e => setUopIncome(sanitizeDecimalInput(e.target.value))}
                       placeholder="np. 10000"
                       className={`bg-[#0f0f23] border text-[#e8e6f0] px-3 py-2 rounded-lg text-sm ${invalid ? 'border-[#f87171]' : 'border-[#2d2d4e]'}`} />
                   </label>

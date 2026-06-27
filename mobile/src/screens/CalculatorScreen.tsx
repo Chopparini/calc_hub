@@ -30,6 +30,17 @@ const VAT_LABELS: Record<string, string> = {
 const fmt = (n: number) =>
   n.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
+function sanitizeDecimalInput(v: string): string {
+  let s = v.replace(/\./g, ',').replace(/[^0-9,]/g, '')
+  const i = s.indexOf(',')
+  if (i !== -1) s = s.slice(0, i + 1) + s.slice(i + 1).replace(/,/g, '')
+  return s
+}
+
+function parseDecimal(v: string): number {
+  return parseFloat(v.replace(',', '.')) || 0
+}
+
 type Tab = 'b2b' | 'uop'
 
 export default function CalculatorScreen() {
@@ -61,7 +72,7 @@ export default function CalculatorScreen() {
       if (p.default_zus_variant) setZusVariant(p.default_zus_variant)
       if (p.default_z_chorobowa !== null) setZChorobowa(p.default_z_chorobowa ?? false)
       if (p.default_vat_rate) setVatRate(p.default_vat_rate)
-      if (p.default_uop_gross) setUopGross(String(p.default_uop_gross))
+      if (p.default_uop_gross) setUopGross(String(p.default_uop_gross).replace('.', ','))
     }).catch(() => {})
   }, [token])
 
@@ -73,8 +84,8 @@ export default function CalculatorScreen() {
         ? {
             contract_type: 'b2b' as const,
             tax_form: taxForm,
-            gross_income: parseFloat(b2bIncome) || 0,
-            monthly_costs: parseFloat(b2bCosts) || 0,
+            gross_income: parseDecimal(b2bIncome),
+            monthly_costs: parseDecimal(b2bCosts),
             zus_variant: zusVariant,
             lump_sum_rate: taxForm === 'lump_sum' ? lumpSumRate : undefined,
             z_chorobowa: zChorobowa,
@@ -82,7 +93,7 @@ export default function CalculatorScreen() {
           }
         : {
             contract_type: 'employment' as const,
-            gross_income: parseFloat(uopGross) || 0,
+            gross_income: parseDecimal(uopGross),
           }
       const res = await calculatorApi.calculate(req)
       setResult(res)
@@ -100,8 +111,8 @@ export default function CalculatorScreen() {
       await calculationsApi.save({
         contract_type: tab === 'b2b' ? 'b2b' : 'employment',
         tax_form: tab === 'b2b' ? taxForm : undefined,
-        gross_income: tab === 'b2b' ? (parseFloat(b2bIncome) || 0) : (parseFloat(uopGross) || 0),
-        monthly_costs: tab === 'b2b' ? (parseFloat(b2bCosts) || 0) : 0,
+        gross_income: tab === 'b2b' ? parseDecimal(b2bIncome) : parseDecimal(uopGross),
+        monthly_costs: tab === 'b2b' ? parseDecimal(b2bCosts) : 0,
       })
       Alert.alert('Zapisano', 'Kalkulacja została zapisana')
     } catch {
@@ -136,15 +147,15 @@ export default function CalculatorScreen() {
           <View style={s.card}>
             <Text style={s.label}>Przychód miesięczny netto (zł)</Text>
             <TextInput
-              style={s.input} keyboardType="numeric"
+              style={s.input} keyboardType="decimal-pad"
               placeholder="np. 15000" placeholderTextColor={colors.textSecondary}
-              value={b2bIncome} onChangeText={setB2bIncome}
+              value={b2bIncome} onChangeText={v => setB2bIncome(sanitizeDecimalInput(v))}
             />
             <Text style={s.label}>Koszty netto (zł)</Text>
             <TextInput
-              style={s.input} keyboardType="numeric"
+              style={s.input} keyboardType="decimal-pad"
               placeholder="np. 500" placeholderTextColor={colors.textSecondary}
-              value={b2bCosts} onChangeText={setB2bCosts}
+              value={b2bCosts} onChangeText={v => setB2bCosts(sanitizeDecimalInput(v))}
             />
 
             <Text style={s.label}>Forma opodatkowania</Text>
@@ -204,9 +215,9 @@ export default function CalculatorScreen() {
           <View style={s.card}>
             <Text style={s.label}>Wynagrodzenie brutto (zł)</Text>
             <TextInput
-              style={s.input} keyboardType="numeric"
+              style={s.input} keyboardType="decimal-pad"
               placeholder="np. 8000" placeholderTextColor={colors.textSecondary}
-              value={uopGross} onChangeText={setUopGross}
+              value={uopGross} onChangeText={v => setUopGross(sanitizeDecimalInput(v))}
             />
           </View>
         )}
